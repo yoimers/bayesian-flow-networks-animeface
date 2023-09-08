@@ -203,9 +203,11 @@ class UNet(nn.Module):
         return x
     
     
-# from torchinfo import summary
-# test = UNet(3, 3)
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-# test.cuda()
-# # 110M
-# print(summary(test, input_size=[(1, 3, 64, 64), (1, 320)]))
+
+
+if __name__ == '__main__':
+    from torchinfo import summary
+    test = UNet(3, 3)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    test.to(device)
+    print(summary(test, input_size=[(1, 3, 64, 64), (1, 320)]))
