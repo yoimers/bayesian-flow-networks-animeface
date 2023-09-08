@@ -7,8 +7,8 @@ AnimeFace dataset generation by BFNs
 
 # Features
 - [ ] Continuous  Bayesian Flow Networks
-- - [ ] loss infinity
-- - [ ] loss discrete
+- - [ ] infinity loss
+- - [ ] discrete loss
 - [ ] Discretised Bayesian Flow Networks
-- - [ ] loss infinity
-- - [ ] loss discrete
+- - [ ] infinity loss
+- - [ ] discrete loss
