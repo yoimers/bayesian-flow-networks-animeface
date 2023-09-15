@@ -157,7 +157,7 @@ class UNet(nn.Module):
         super().__init__()
         # input (3, 64, 64)
         self.encoders = nn.ModuleList([
-            Switch(nn.Conv2d(3, 160, kernel_size=3, padding=1)),                # input (160, 64, 64)
+            Switch(nn.Conv2d(in_channels, 160, kernel_size=3, padding=1)),                # input (160, 64, 64)
             Switch(ResidualBlock(160, 160), AttentionBlock(8, 20)),             # input (160, 64, 64)
             Switch(ResidualBlock(160, 160), AttentionBlock(8, 20)),             # input (160, 64, 64)
             Switch(nn.Conv2d(160, 160, kernel_size=3, stride=2, padding=1)),    # input (160, 32, 32)
@@ -188,7 +188,7 @@ class UNet(nn.Module):
             Switch(ResidualBlock(480, 320), AttentionBlock(8, 40)),
         ])
         self.time_embedding = TimeEmbedding(320)
-        self.final_layer = FinalLayer(320, 3)
+        self.final_layer = FinalLayer(320, out_channels)
 
     def forward(self, x, time):
         time = self.time_embedding(time)
@@ -198,7 +198,6 @@ class UNet(nn.Module):
             skip_connections.append(x)
 
         x = self.bottleneck(x, time)
-
         for layers in self.decoders:
             x = torch.cat((x, skip_connections.pop()), dim=1)
             x = layers(x, time)
@@ -210,7 +209,9 @@ class UNet(nn.Module):
 
 if __name__ == '__main__':
     from torchinfo import summary
-    test = UNet(3, 3)
+    # (3, 6) 110,884,646
+    # (3, 3) 110,884,646
+    test = UNet(3, 3) 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     test.to(device)
     print(summary(test, input_size=[(1, 3, 64, 64), (1, 320)]))
