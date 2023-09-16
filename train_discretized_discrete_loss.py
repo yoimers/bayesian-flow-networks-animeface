@@ -1,8 +1,8 @@
 import argparse
 from train_common import BFNType, TimeType, setup_train_common_parser, train
 
-bfnType=BFNType.Continuous
-timeType=TimeType.ContinuousTimeLoss
+bfnType=BFNType.Discretized
+timeType=TimeType.DiscreteTimeLoss
 
 def setup_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
