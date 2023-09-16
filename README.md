@@ -1,5 +1,6 @@
 # BFNs-animeface
-AnimeFace dataset generation by BFNs
+
+AnimeFace dataset generation by BFNs [Bayesian Flow Networks](https://arxiv.org/abs/2308.07037)
 
 ## Continuous Bayesian Flow Networks
 ![bfn_continuours_lossinfinity](resource/bfn_continuours_lossinfinity_sigma0.001.gif)
@@ -49,6 +50,7 @@ python train_discretized_discrete_loss.py --save_model_path "./models/model.pth"
 
 ### Other
 #### Used Unet
+Show Summary
 ```
 python networks/unet.py
 ```
