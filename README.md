@@ -46,6 +46,27 @@ python train_discretized.py --save_model_path "./models/model.pth" --epoch 100 -
 ```
 python train_discretized_discrete_loss.py --save_model_path "./models/model.pth" --epoch 100 --sigma 0.001 --batch 32 --height 32 --width 32 --max_step 1000 --K 16 
 ```
+
+### Other
+#### Used Unet
+```
+python networks/unet.py
+```
+
+```txt
+===============================================================================================
+Total params: 110,876,003
+Trainable params: 110,876,003
+Non-trainable params: 0
+Total mult-adds (G): 99.13
+===============================================================================================
+Input size (MB): 0.05
+Forward/backward pass size (MB): 1555.33
+Params size (MB): 443.47
+Estimated Total Size (MB): 1998.85
+===============================================================================================
+```
+
 # Features
 - [x] Continuous Bayesian Flow Networks
 - - [x] infinity loss
