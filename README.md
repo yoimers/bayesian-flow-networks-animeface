@@ -6,7 +6,11 @@ AnimeFace dataset generation by BFNs
 
 ### Infinity Loss
 #### Sample Images
+Generated Images
+(The number above is the number of Steps)
 ![bfn_continuours_lossinfinity](resource/bfn_continuours_lossinfinity_sigma0.001_generate.png)
+Validated Images
+(Upper is parameter μ, lower is Output)
 ![bfn_continuours_lossinfinity](resource/bfn_continuours_lossinfinity_sigma0.001_valid.png)
 
 ### Sample Train Code
@@ -16,7 +20,11 @@ python train_continuours.py --save_model_path "./models/model.pth" --epoch 100 -
 
 ### Discrete Loss
 #### Sample Images
+Generated Images
+(The number above is the number of Steps)
 ![bfn_continuours_lossdiscrete](resource/bfn_continuours_lossdiscrete_sigma0.001_generate.png)
+Validated Images
+(Upper is parameter μ, lower is Output)
 ![bfn_continuours_lossdiscrete](resource/bfn_continuours_lossdiscrete_sigma0.001_valid.png)
 
 ### Sample Train Code
