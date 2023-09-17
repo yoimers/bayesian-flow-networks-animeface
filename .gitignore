@@ -2,5 +2,5 @@ animeface
 animeface_avalid
 outputs
 runs
-models
+models/*
 **/__pycache__

@@ -6,7 +6,7 @@ from train_common import BFNType, TimeType
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 bfnType = BFNType.Discretized
-timeType = TimeType.DiscreteTimeLoss
+timeType = TimeType.ContinuousTimeLoss
 
 def setup_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
