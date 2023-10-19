@@ -25,6 +25,7 @@ from utils import default_transform
 import argparse
 from enum import Enum, auto
 from torch.utils.tensorboard import SummaryWriter
+from data.molecule_dataset import MoleculeDataset
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -37,12 +38,11 @@ class TimeType(Enum):
     DiscreteTimeLoss = auto()
 
 def train(args: argparse.ArgumentParser, bfnType: BFNType, timeType: TimeType):
-    transform = default_transform(args.height, args.width)
-    dataset = datasets.ImageFolder(root=args.data_path, transform=transform)
+    dataset = MoleculeDataset("bfn_exercise.pkl", conditioned=args.conditioned)
     train_loader = torch.utils.data.DataLoader(dataset=dataset, batch_size=args.batch, shuffle=True, num_workers=8)
     
     if bfnType == BFNType.Continuous:
-        unet = UNet(3, 3).to(device)
+        unet = UNet(1, 1).to(device)
     elif bfnType == BFNType.Discretized:
         unet = UNet(3, 6).to(device)
     else:
@@ -67,10 +67,14 @@ def train(args: argparse.ArgumentParser, bfnType: BFNType, timeType: TimeType):
     num = 1
     for epoch in tqdm(range(1, args.epoch+1), desc='Training', unit='epoch'):
         losses = []
-        for X, _ in tqdm(train_loader, desc='Epoch {}'.format(epoch), unit='batch'):
+        for X, y in tqdm(train_loader, desc='Epoch {}'.format(epoch), unit='batch'):
             optimizer.zero_grad()
+            if not args.conditioned:
+                y = None
+            else:
+                y = y.to(device)
             if timeType == TimeType.ContinuousTimeLoss:
-                loss = bfn.process_infinity(X.to(device))
+                loss = bfn.process_infinity(X.to(device), y)
             elif timeType == TimeType.DiscreteTimeLoss:
                 loss = bfn.process_discrete(X.to(device), max_step=args.max_step)
             else:
@@ -113,5 +117,6 @@ def setup_train_common_parser(parser: argparse.ArgumentParser) -> argparse.Argum
     # Discrete Time Loss Option
     parser.add_argument("--K", type=int, default=16)
     parser.add_argument("--max_step", type=int, default=1000)
+    parser.add_argument("--conditioned", type=bool, default=False)
     return parser
 

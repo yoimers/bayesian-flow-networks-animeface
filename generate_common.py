@@ -62,7 +62,7 @@ def input_output_image(args, bfn: BFNContinuousData, bfnType: BFNType, timeType:
 def common_generate(args: argparse.ArgumentParser, bfnType: BFNType, timeType: TimeType):
     set_seed(args.seed)
     if bfnType == BFNType.Continuous:
-        unet = UNet(3, 3).to(device=device)
+        unet = UNet(1, 1).to(device=device)
     elif bfnType == BFNType.Discretized:
         unet = UNet(3, 6).to(device=device)
     else:
@@ -89,38 +89,41 @@ def common_generate(args: argparse.ArgumentParser, bfnType: BFNType, timeType: T
     with torch.no_grad():
         x_hat, out_list = bfn.sample(args.height, args.width, device=device, steps=args.step, return_samples=return_samples, batch_size=args.batch, ema=ema)
     
-    if args.gif_generate:
-        fig, ax = plt.subplots(1, args.batch, figsize=(2 * args.batch, 2))
-        def animate(frame):
-            for i in range(args.batch):
-                ax[i].clear()
-                ax[i].imshow(((out_list[frame][i]+1)/2*255).clamp(0, 255).to(torch.uint8).permute(1, 2, 0).cpu().detach().numpy())
-                ax[i].axis('off')
-                ax[i].set_title(f'Step {max(1, args.gif_save_every_n_step * frame)}', fontsize=12)
+    # Save the generations
+    torch.save(out_list, args.save_generation_path)
+
+    # if args.gif_generate:
+    #     fig, ax = plt.subplots(1, args.batch, figsize=(2 * args.batch, 2))
+    #     def animate(frame):
+    #         for i in range(args.batch):
+    #             ax[i].clear()
+    #             ax[i].imshow(((out_list[frame][i]+1)/2*255).clamp(0, 255).to(torch.uint8).permute(1, 2, 0).cpu().detach().numpy())
+    #             ax[i].axis('off')
+    #             ax[i].set_title(f'Step {max(1, args.gif_save_every_n_step * frame)}', fontsize=12)
                 
-        anim = FuncAnimation(fig, animate, frames=args.step//args.gif_save_every_n_step, interval=100)
-        plt.subplots_adjust(left=0.02, right=0.98, top=0.9, bottom=0.02)
-        anim.save("./outputs/generate_output.gif", writer='pillow')
-    else:
-        fig, ax = plt.subplots(args.batch, len(out_list), figsize=(8, args.batch))
-        for i in range(len(out_list)):
-            for b in range(len(out_list[i])):
-                ax[b, i].imshow(((out_list[i][b]+1)/2*255).clamp(0, 255).to(torch.uint8).permute(1, 2, 0).cpu().detach().numpy())
-                ax[b, i].axis('off')
-        for i in range(len(out_list)):
-            ax[0, i].set_title(np.round(return_samples*i, 2))
-        plt.subplots_adjust(left=0.02, right=0.98, top=0.95, bottom=0.02)
-        plt.savefig('./outputs/generate_plots.png') # Generated image every step//10
+    #     anim = FuncAnimation(fig, animate, frames=args.step//args.gif_save_every_n_step, interval=100)
+    #     plt.subplots_adjust(left=0.02, right=0.98, top=0.9, bottom=0.02)
+    #     anim.save("./outputs/generate_output.gif", writer='pillow')
+    # else:
+    #     fig, ax = plt.subplots(args.batch, len(out_list), figsize=(8, args.batch))
+    #     for i in range(len(out_list)):
+    #         for b in range(len(out_list[i])):
+    #             ax[b, i].imshow(((out_list[i][b]+1)/2*255).clamp(0, 255).to(torch.uint8).permute(1, 2, 0).cpu().detach().numpy())
+    #             ax[b, i].axis('off')
+    #     for i in range(len(out_list)):
+    #         ax[0, i].set_title(np.round(return_samples*i, 2))
+    #     plt.subplots_adjust(left=0.02, right=0.98, top=0.95, bottom=0.02)
+    #     plt.savefig('./outputs/generate_plots.png') # Generated image every step//10
         
-    # Save PIL Image
-    to_pil = ToPILImage()
-    pil_images = [to_pil(((image+1)/2*255).clamp(0, 255).to(torch.uint8)) for image in x_hat]
-    for i, pil_image in enumerate(pil_images):
-        pil_image.convert("RGB").save(f'./outputs/image_{i}.png') # Generated images
+    # # Save PIL Image
+    # to_pil = ToPILImage()
+    # pil_images = [to_pil(((image+1)/2*255).clamp(0, 255).to(torch.uint8)) for image in x_hat]
+    # for i, pil_image in enumerate(pil_images):
+    #     pil_image.convert("RGB").save(f'./outputs/image_{i}.png') # Generated images
         
-    # Comparison of Input and Output images
-    if args.generate_input_output_image:
-        input_output_image(args, bfn, bfnType=bfnType, timeType=timeType)
+    # # Comparison of Input and Output images
+    # if args.generate_input_output_image:
+    #     input_output_image(args, bfn, bfnType=bfnType, timeType=timeType)
 
 def setup_generate_common_parser(parser: argparse.ArgumentParser) -> argparse.ArgumentParser:
     parser.add_argument("--load_model_path", type=str, required=True, default="./models/model.pth", help="Path to the pre-trained model file.")
@@ -135,4 +138,5 @@ def setup_generate_common_parser(parser: argparse.ArgumentParser) -> argparse.Ar
     parser.add_argument("--generate_input_output_image", action="store_true", help="Whether to generate input(θ, mu, ...) and output images.")
     parser.add_argument("-gif", "--gif_generate", action="store_true", help="Whether to generate output images gif.")
     parser.add_argument("--gif_save_every_n_step", type=int, default=50)
+    parser.add_argument("--save_generation_path", type=str, required=True, default="./generations/generated.gen")
     return parser

@@ -48,7 +48,7 @@ class BFNContinuousData(nn.Module):
         # print(x_pred)
         return x_pred
 
-    def process_infinity(self, x, t=None, return_params=False):
+    def process_infinity(self, x, logp=None, t=None, return_params=False):
         """
         x : torch.Tensor
             Tensor of shape (B, C, H, W).
@@ -66,6 +66,9 @@ class BFNContinuousData(nn.Module):
         mu = gamma * x + (gamma * (1 - gamma)).sqrt() * torch.randn_like(x) # (B, C, H, W)
         pred = self.cts_output_prediction(mu, t, gamma)
         loss_infinity = -torch.log(self.sigma) * self.sigma ** (-2 * t[:, None, None, None]) * (x - pred)**2
+        # Conditioning on logp
+        if logp is not None:
+            loss_infinity *= logp.view(-1,1,1,1)
         if return_params:
             return loss_infinity.mean(), mu, pred, t
         else:
