@@ -2,6 +2,8 @@
 
 AnimeFace dataset generation by BFNs [Bayesian Flow Networks](https://arxiv.org/abs/2308.07037)
 
+The code for BFNs should be the official code reference here [Bayesian Flow Networks](https://github.com/nnaisense/bayesian-flow-networks)
+
 ## Continuous Bayesian Flow Networks
 
 Continuous Infinity Time Loss ( steps=1000 sigma=0.001 )
